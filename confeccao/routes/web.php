@@ -3,12 +3,23 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\EstoqueController;
+use App\Http\Controllers\FornecedorController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+// As páginas de clientes e pedidos devem ser vistas apenas por usuários
+// autenticados. Sem login, o layout tenta acessar Auth::user()->name e acaba
+// lançando "Attempt to read property 'name' on null".
+Route::middleware('auth')->group(function () {
+    Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+    Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedido.index');
+    Route::get('/estoque', [EstoqueController::class, 'index'])->name('estoque.index');
+    Route::get('/fornecedor', [FornecedorController::class, 'index'])->name('fornecedor.index');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');

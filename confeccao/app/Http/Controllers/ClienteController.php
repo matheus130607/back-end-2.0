@@ -8,7 +8,7 @@ class ClienteController extends Controller
 {
     public function index() {
         try {
-            $clientes = \App\Models\clientes::all(); // Busca todos os clientes
+            $clientes = \App\Models\Cliente::all(); // Busca todos os clientes
         } catch (\Exception $e) {
             // se houver problema com o banco (ex: driver ausente), exibir dados estáticos
             $clientes = collect([
