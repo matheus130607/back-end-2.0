@@ -7,10 +7,10 @@
 
     <div class="py-12" style="background: linear-gradient(135deg, #0f172a, #1e3a8a, #3b82f6); min-height: 80vh;">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-10">
+            <div class="bg-black overflow-hidden shadow-sm sm:rounded-lg p-10">
 
                 <div style="text-align: center; margin-bottom: 40px;">
-                    <h3 style="font-size: 22px; font-weight: bold; color: #1e3a8a;">
+                    <h3 style="font-size: 22px; font-weight: bold; color: #fff;">
                         Painel da Confecção
                     </h3>
                     <p style="color: #64748b;">Acesse as áreas do sistema</p>
@@ -71,6 +71,40 @@
                     " onmouseover="this.style.transform='translateY(-5px)'" 
                        onmouseout="this.style.transform='translateY(0)'">
                         🏬 Estoque
+                    </a>
+
+                    <!-- Botão Pedidos -->
+                    <a href="/fornecedor" style="
+                        background: #a31616;
+                        color: white;
+                        padding: 30px;
+                        border-radius: 12px;
+                        text-align: center;
+                        text-decoration: none;
+                        font-weight: bold;
+                        font-size: 18px;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                        transition: 0.3s;
+                    " onmouseover="this.style.transform='translateY(-5px)'" 
+                       onmouseout="this.style.transform='translateY(0)'">
+                        🚚 Fornecedores
+                    </a>
+
+                    <!-- Botão Produtos -->
+                    <a href="/produto" style="
+                        background: #4c1d95;
+                        color: white;
+                        padding: 30px;
+                        border-radius: 12px;
+                        text-align: center;
+                        text-decoration: none;
+                        font-weight: bold;
+                        font-size: 18px;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                        transition: 0.3s;
+                    " onmouseover="this.style.transform='translateY(-5px)'" 
+                       onmouseout="this.style.transform='translateY(0)'">
+                        🛍️ Produtos
                     </a>
 
                 </div>

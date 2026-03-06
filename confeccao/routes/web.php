@@ -6,6 +6,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\FornecedorController;
+use App\Http\Controllers\ProdutoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedido.index');
     Route::get('/estoque', [EstoqueController::class, 'index'])->name('estoque.index');
     Route::get('/fornecedor', [FornecedorController::class, 'index'])->name('fornecedor.index');
+    Route::get('/produto', [ProdutoController::class, 'index'])->name('produto.index');
 });
 
 Route::get('/dashboard', function () {

@@ -29,40 +29,63 @@
             gap: 25px;
         }
 
-        .card-fornecedor {
+        .card-pedido {
             background: #ffffff;
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             transition: 0.3s ease-in-out;
-            border-left: 6px solid #a31616;
+            border-left: 6px solid #16a34a;
         }
 
-        .card-fornecedor:hover {
+        .card-pedido:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
         }
 
-        .card-fornecedor h3 {
+        .card-pedido h3 {
             margin: 0 0 10px;
-            color: #a31616;
+            color: #166534;
             font-size: 20px;
         }
 
-        .card-fornecedor p {
+        .card-pedido p {
             margin: 5px 0;
             color: #475569;
             font-size: 15px;
         }
 
-        .info {
+        .status {
             font-weight: bold;
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-radius: 8px;
             display: inline-block;
             margin-top: 8px;
-            /* background-color: #e0f2fe; */
-            color: #000;
+        }
+
+        .status-pendente {
+            background-color: #facc15;
+            color: #78350f;
+        }
+
+        .status-em_producao {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .status-pronto {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .status-entregue {
+            background-color: #16a34a;
+            color: white;
+        }
+
+        .status-cancelado {
+            background-color: #ef4444;
+            color: white;
         }
 
         .titulo-header {
@@ -74,27 +97,21 @@
     </style>
 
     <x-slot name="header">
-        <h2 class="titulo-header">Controle de fornecedores</h2>
+        <h2 class="titulo-header">Pedidos da Confecção</h2>
     </x-slot>
 
     <div class="container-geral">
         <div class="container-nivel-1">
             <div class="container-nivel-2">
                 <div class="container-nivel-3">
-                    @foreach ($fornecedors as $fornecedor)
-                        <div class="card-fornecedor">
-                            <h3>{{ $fornecedor->nome }}</h3>
+                    @foreach ($pedidos as $pedido)
+                        <div class="card-pedido">
+                            <h3>{{ $pedido->nome }}</h3>
+                            <p>Preço: R$ {{ number_format($pedido->preco, 2, ',', '.') }}</p>
 
-                            <p>Email:</p>
-                            <span class="info">
-                                {{ $fornecedor->email }}
+                            <span class="status status-{{ $pedido->status }}">
+                                {{ ucfirst(str_replace('_', ' ', $pedido->status)) }}
                             </span>
-
-                            <p>CNPJ:</p>
-                            <span class="info">
-                                {{ $fornecedor->cnpj }}
-                            </span>
-
                         </div>
                     @endforeach
                 </div>

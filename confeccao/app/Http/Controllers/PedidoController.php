@@ -23,6 +23,6 @@ class PedidoController extends Controller
         // A view nomeada anteriormente estava incorreta. o arquivo real está em
         // resources/views/pedidos/index2.blade.php, portanto precisamos incluir o
         // namespace da pasta.
-        return view('pedidos.index2', compact('pedidos'));
+        return view('pedidos.index', compact('pedidos'));
     }
 }

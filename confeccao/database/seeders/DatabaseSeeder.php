@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\Pedido;
 use App\Models\Estoque;
 use App\Models\Fornecedor;
+use App\Models\Produto;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -51,6 +52,19 @@ class DatabaseSeeder extends Seeder
         Fornecedor::factory()->create([
             'nome' => 'Fornecedor Principal',
             'email' => 'fornecedor@gmail.com',
+        ]);
+
+        // produtos
+        Produto::factory(10)->create();
+
+        // exemplo fixo de produto
+        Produto::factory()->create([
+            'nome' => 'Camiseta Básica',
+            'descricao' => 'Camiseta de algodão confortável',
+            'preco' => 49.90,
+            'quantidade' => 50,
+            'tamanho' => 'M',
+            'cor' => 'Preto',
         ]);
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fornecedores', function (Blueprint $table) {
+        Schema::create('fornecedors', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
             $table->string('cnpj')->nullable();
@@ -28,7 +28,7 @@ return new class extends Migration
     public function down(): void
     {
         // havia um erro de digitação no nome da tabela ao fazer rollback
-        // ("fornecedors" em vez de "fornecedores").
-        Schema::dropIfExists('fornecedores');
+        // ("fornecedores" em vez de "fornecedores").
+        Schema::dropIfExists('fornecedors');
     }
 };
