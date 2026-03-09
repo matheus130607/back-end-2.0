@@ -61,6 +61,60 @@
             font-size: 28px;
             margin-bottom: 20px;
         }
+
+        .botao-novo {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-bottom: 25px;
+        }
+
+        .botao-novo:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+        }
+
+        .area-botao {
+            text-align: center;
+        }
+
+        /* ALERT CLEAN */
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            border: 1px solid #86efac;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+
+            animation: desaparecer 2s forwards;
+        }
+
+        @keyframes desaparecer {
+            0% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
     </style>
 
     <x-slot name="header">
@@ -69,17 +123,39 @@
 
     <div class="container-geral">
         <div class="container-nivel-1">
+
+            @if(session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            <div class="area-botao">
+                <a href="/clientes/create" class="botao-novo">
+                    + Cadastrar Novo Cliente
+                </a>
+            </div>
+
             <div class="container-nivel-2">
                 <div class="container-nivel-3">
+
                     @foreach ($clientes as $cliente)
-                        <div class="card-cliente">
-                            <h3>{{ $cliente->nome }}</h3>
-                            <p>CPF: {{ $cliente->cpf }}</p>
-                            <p>Telefone: {{ $cliente->telefone }}</p>
-                        </div>
+
+                    <div class="card-cliente">
+
+                        <h3>{{ $cliente->nome }}</h3>
+
+                        <p>CPF: {{ $cliente->cpf }}</p>
+
+                        <p>Telefone: {{ $cliente->telefone }}</p>
+
+                    </div>
+
                     @endforeach
+
                 </div>
             </div>
+
         </div>
     </div>
 

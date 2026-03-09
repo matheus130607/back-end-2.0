@@ -1,19 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
+            {{ __('Painel de comando') }}
         </h2>
     </x-slot>
 
     <div class="py-12" style="background: linear-gradient(135deg, #0f172a, #1e3a8a, #3b82f6); min-height: 80vh;">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-black overflow-hidden shadow-sm sm:rounded-lg p-10">
+            <div class="bg- overflow-hidden shadow-sm sm:rounded-lg p-10">
 
                 <div style="text-align: center; margin-bottom: 40px;">
                     <h3 style="font-size: 22px; font-weight: bold; color: #fff;">
                         Painel da Confecção
                     </h3>
-                    <p style="color: #64748b;">Acesse as áreas do sistema</p>
+                    <p style="color: #bfbfc0;">Acesse as áreas do sistema</p>
                 </div>
 
                 <div style="

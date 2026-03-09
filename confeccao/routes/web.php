@@ -33,4 +33,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Rota para mostrar o formulário
+Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
+Route::get('/pedidos/create', [PedidoController::class, 'create'])->name('pedido.create');
+Route::get('/estoque/create', [EstoqueController::class, 'create'])->name('estoque.create');
+Route::get('/fornecedor/create', [FornecedorController::class, 'create'])->name('fornecedor.create');
+Route::get('/produto/create', [ProdutoController::class, 'create'])->name('produtos.create');
+
+
+//Rota para RECEBER os dados e salvar (POST)
+Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
+Route::post('/pedidos', [PedidoController::class, 'store'])->name('pedido.store');
+Route::post('/estoque', [EstoqueController::class, 'store'])->name('estoque.store');
+Route::post('/fornecedor', [FornecedorController::class, 'store'])->name('fornecedor.store');
+Route::post('/produto', [ProdutoController::class, 'store'])->name('produtos.store');
+
+
 require __DIR__.'/auth.php';

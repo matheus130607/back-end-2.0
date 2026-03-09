@@ -71,6 +71,60 @@
             font-size: 28px;
             margin-bottom: 20px;
         }
+
+        .botao-novo {
+            display: inline-block;
+            background: #6b21a8;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-bottom: 25px;
+        }
+
+        .botao-novo:hover {
+            background: #50197e;
+            transform: translateY(-2px);
+        }
+
+        .area-botao {
+            text-align: center;
+        }
+
+        /* ALERT CLEAN */
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            border: 1px solid #86efac;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+
+            animation: desaparecer 2s forwards;
+        }
+
+        @keyframes desaparecer {
+            0% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
     </style>
 
     <x-slot name="header">
@@ -79,36 +133,54 @@
 
     <div class="container-geral">
         <div class="container-nivel-1">
+
+            @if(session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            <div class="area-botao">
+                <a href="/produto/create" class="botao-novo">
+                    + Cadastrar Novo Produto
+                </a>
+            </div>
+
             <div class="container-nivel-2">
                 <div class="container-nivel-3">
+
                     @foreach ($produtos as $produto)
-                        <div class="card-produto">
 
-                            <h3>{{ $produto->nome }}</h3>
+                    <div class="card-produto">
 
-                            <p>{{ $produto->descricao }}</p>
+                        <h3>{{ $produto->nome }}</h3>
 
-                            <p>Preço: R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+                        <p>{{ $produto->descricao }}</p>
 
-                            <p>Quantidade:</p>
-                            <span class="info">
-                                {{ $produto->quantidade }}
-                            </span>
+                        <p>Preço: R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                            <p>Tamanho:</p>
-                            <span class="info">
-                                {{ $produto->tamanho }}
-                            </span>
+                        <p>Quantidade:</p>
+                        <span class="info">
+                            {{ $produto->quantidade }}
+                        </span>
 
-                            <p>Cor:</p>
-                            <span class="info">
-                                {{ $produto->cor }}
-                            </span>
+                        <p>Tamanho:</p>
+                        <span class="info">
+                            {{ $produto->tamanho }}
+                        </span>
 
-                        </div>
+                        <p>Cor:</p>
+                        <span class="info">
+                            {{ $produto->cor }}
+                        </span>
+
+                    </div>
+
                     @endforeach
+
                 </div>
             </div>
+
         </div>
     </div>
 
