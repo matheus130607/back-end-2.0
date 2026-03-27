@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Support\RawJs;
 
 class ClienteResource extends Resource
 {
@@ -33,7 +34,8 @@ class ClienteResource extends Resource
         ->schema([
             TextInput::make('nome')->required()->label('Nome Completo'),
             TextInput::make('email')->email()->label('Email'),
-            TextInput::make('telefone')->tel()->label('Telefone/Zap'),
+            TextInput::make('telefone')->tel()->label('Telefone/Zap')->mask('(99) 99999-9999'),
+
             TextInput::make('documento')->label('CPF ou CNPJ'),
         ]);
     }

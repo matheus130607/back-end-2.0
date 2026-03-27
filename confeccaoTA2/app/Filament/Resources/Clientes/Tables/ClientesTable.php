@@ -37,8 +37,8 @@ class ClientesTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->label("Vizualizar"),
+                EditAction::make()->label("Editar"),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
