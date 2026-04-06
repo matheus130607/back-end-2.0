@@ -13,6 +13,7 @@ use App\Filament\Resources\Pedidos\Tables\PedidosTable;
 use App\Models\Pedido;
 use App\Models\Produto;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -29,6 +30,18 @@ class PedidoResource extends Resource
     protected static ?string $model = Pedido::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Vendas';
+    protected static ?int $navigationSort = 1;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Pedido';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Pedido';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Pedidos';
 
     protected static ?string $recordTitleAttribute = 'Pedido';
 

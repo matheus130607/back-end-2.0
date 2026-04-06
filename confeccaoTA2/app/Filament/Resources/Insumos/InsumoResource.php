@@ -11,6 +11,7 @@ use App\Filament\Resources\Insumos\Schemas\InsumoInfolist;
 use App\Filament\Resources\Insumos\Tables\InsumosTable;
 use App\Models\Insumo;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -24,11 +25,23 @@ class InsumoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static string|UnitEnum|null $navigationGroup = 'Estoques';
+    protected static ?int $navigationSort = 3;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Insumo';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Insumo';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Insumos';
+
     protected static ?string $recordTitleAttribute = 'Insumo';
 
     public static function form(Schema $schema): Schema
     {
-        return InsumoForm::configure($schema);
+        
         return $schema->schema([
             TextInput::make('nome')->required(),
             TextInput::make('unidade_medida')->required()->label('Unidade (Kg, Metros, Un...)'),
@@ -44,7 +57,8 @@ class InsumoResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return InsumosTable::configure($table);
+        
+    
         return $table->columns([
             TextColumn::make('nome')->searchable(),
             TextColumn::make('unidade_medida'),

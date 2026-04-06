@@ -11,6 +11,7 @@ use App\Filament\Resources\Clientes\Schemas\ClienteInfolist;
 use App\Filament\Resources\Clientes\Tables\ClientesTable;
 use App\Models\Cliente;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,9 +20,22 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Support\RawJs;
 
+
 class ClienteResource extends Resource
 {
     protected static ?string $model = Cliente::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Cadastros Gerais';
+    protected static ?int $navigationSort = 1;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Cliente';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Cliente';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Clientes';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

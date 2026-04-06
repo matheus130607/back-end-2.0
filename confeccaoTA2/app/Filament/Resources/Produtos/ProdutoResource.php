@@ -11,6 +11,7 @@ use App\Filament\Resources\Produtos\Schemas\ProdutoInfolist;
 use App\Filament\Resources\Produtos\Tables\ProdutosTable;
 use App\Models\Produto;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -23,6 +24,18 @@ class ProdutoResource extends Resource
     protected static ?string $model = Produto::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Estoques';
+    protected static ?int $navigationSort = 1;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Produto';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Produto';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Produtos';
 
     protected static ?string $recordTitleAttribute = 'Produto';
 

@@ -11,6 +11,7 @@ use App\Filament\Resources\Fornecedors\Schemas\FornecedorInfolist;
 use App\Filament\Resources\Fornecedors\Tables\FornecedorsTable;
 use App\Models\Fornecedor;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -23,6 +24,19 @@ class FornecedorResource extends Resource
     protected static ?string $model = Fornecedor::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Cadastros Gerais';
+    protected static ?int $navigationSort = 2;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Fornecedor';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Fornecedor';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Fornecedores';
+
 
     protected static ?string $recordTitleAttribute = 'fonecedor';
 

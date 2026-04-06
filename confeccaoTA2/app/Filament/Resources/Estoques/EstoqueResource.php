@@ -10,6 +10,7 @@ use App\Filament\Resources\Estoques\Schemas\EstoqueInfolist;
 use App\Models\Estoque;
 use App\Models\Produto;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema; 
 use Filament\Support\Icons\Heroicon;
@@ -23,6 +24,18 @@ class EstoqueResource extends Resource
     protected static ?string $model = Estoque::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Estoques';
+    protected static ?int $navigationSort = 2;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Estoque';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Estoque';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Estoques';
 
     public static function form(Schema $schema): Schema
     {

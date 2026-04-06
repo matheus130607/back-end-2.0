@@ -11,6 +11,7 @@ use App\Filament\Resources\Permissions\Schemas\PermissionInfolist;
 use App\Filament\Resources\Permissions\Tables\PermissionsTable;
 use Spatie\Permission\Models\Permission;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -25,13 +26,25 @@ class PermissionResource extends Resource
     //     return auth()->user()?->hasRole('Admin') ?? false;
     // }
 
-    public static function canAccess(): bool {
-        return auth()->user()?->can('acessar_clientes') ?? false;
-    }
+    // public static function canAccess(): bool {
+    //     return auth()->user()?->can('acessar_clientes') ?? false;
+    // }
 
     protected static ?string $model = Permission::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Permissões';
+    protected static ?int $navigationSort = 1;
+
+    // Nome que vai aparecer no menu Integral
+    protected static ?string $navigationLabel = 'Permissão';
+
+    // Nome singular (ex: usado no botão "Criar Usuário")
+    protected static ?string $modelLabel = 'Permissão';
+
+    // Nome plural (ex: usado no título da tabela "Usuários")
+    protected static ?string $pluralModelLabel = 'Permissões';
 
     protected static ?string $recordTitleAttribute = 'Permissões';
 
