@@ -1,23 +1,21 @@
 <?php
-
 use App\Http\Controllers\AuthorizationController;
+use App\Http\Controllers\PortariaController;
 use App\Models\User;
 use App\Models\Student;
 use Illuminate\Support\Facades\Route;
 
-// Rota base apenas para checar se o sistema está online
+// Rota base
 Route::get('/', function () {
     return response()->json(['status' => 'SAFE Online']);
 });
 
-// 1. Rota de Massa de Dados (Apenas para criar os usuários de teste no banco)
+// 1. Criar Massa de Dados
 Route::get('/seed-teste', function() {
-    // Evita duplicar se você rodar mais de uma vez
     if (User::where('email', 'pai@email.com')->exists()) {
         return response()->json(['message' => 'Os dados de teste já existem no banco!']);
     }
 
-    // Criando o Autorizador (Pai)
     $autorizador = User::create([
         'name' => 'Marcos Rocha (Pai)',
         'email' => 'pai@email.com',
@@ -26,7 +24,6 @@ Route::get('/seed-teste', function() {
         'phone' => '11999998888'
     ]);
 
-    // Criando o Professor
     User::create([
         'name' => 'Profª Ana Souza',
         'email' => 'ana@escola.com',
@@ -34,7 +31,14 @@ Route::get('/seed-teste', function() {
         'role' => 'professor'
     ]);
 
-    // Criando o Aluno vinculado ao Pai
+    // Criando o Porteiro Silva para a portaria usar mais tarde
+    User::create([
+        'name' => 'Porteiro Silva',
+        'email' => 'silva@escola.com',
+        'password' => bcrypt('123456'),
+        'role' => 'portaria'
+    ]);
+
     $aluno = Student::create([
         'name' => 'Guilherme Rocha',
         'classroom' => '4º Ano B',
@@ -48,5 +52,20 @@ Route::get('/seed-teste', function() {
     ]);
 });
 
-// 2. Rota que simula o clique do Autorizador no aplicativo enviando os dados
-Route::post('/autorizador/solicitar', [AuthorizationController::class, 'solicitarFluxo']);
+// 2. ROTA DE TESTE DA SECRETARIA (Modificada para GET para funcionar no navegador)
+Route::get('/teste/secretaria/solicitar', function() {
+    // Simula o preenchimento de um formulário da secretaria
+    $dadosSimulados = new \Illuminate\Http\Request([
+        'student_id'     => 1,
+        'autorizador_id' => 1,
+        'type'           => 'saida' // Pode mudar para 'entrada' se quiser testar o outro fluxo
+    ]);
+
+    return app(AuthorizationController::class)->solicitarFluxo($dadosSimulados);
+});
+
+// 3. Painel do Professor
+Route::get('/professor/painel', [AuthorizationController::class, 'painelProfessor']);
+
+// 4. ROTA DE TESTE DA PORTARIA (Modificada para GET para funcionar no navegador)
+Route::get('/teste/portaria/liberar/{id}', [PortariaController::class, 'liberarAluno']);

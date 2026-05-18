@@ -60,4 +60,25 @@ class AuthorizationController extends Controller
             'dados'   => $authorization->load('student')
         ], 201);
     }
+
+    public function painelProfessor(Request $request)
+    {
+    // O professor filtra pela turma que ele está lecionando no momento
+    $request->validate([
+        'classroom' => 'required|string' // Ex: "4º Ano B"
+    ]);
+
+    // Busca as autorizações de hoje para a turma informada
+    $fluxosDoDia = Authorization::with('student')
+        ->whereHas('student', function ($query) use ($request) {
+            $query->where('classroom', $request->classroom);
+        })
+        ->whereDate('created_at', now()->today())
+        ->get();
+
+    return response()->json([
+        'turma' => $request->classroom,
+        'alertas_para_o_professor' => $fluxosDoDia
+    ]);
+}
 }

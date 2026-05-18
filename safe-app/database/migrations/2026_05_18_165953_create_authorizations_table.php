@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->foreignId('autorizador_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('portaria_id')->nullable()->constrained('users');
-
+            
+            $table->enum('type', ['entrada', 'saida']);
+            
             $table->enum('status', ['autorizado', 'realizado', 'recusado'])->default('autorizado');
 
             $table->timestamp('validated_at')->nullable();
