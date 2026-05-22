@@ -20,10 +20,6 @@ class PortariaController extends Controller
             ->whereDate('validated_at', $today)
             ->get();
 
-        $averageReleaseMinutes = $releasedToday
-            ->filter(fn (Authorization $authorization) => $authorization->teacher_acknowledged_at && $authorization->validated_at)
-            ->avg(fn (Authorization $authorization) => $authorization->teacher_acknowledged_at->diffInMinutes($authorization->validated_at));
-
         return view('portaria.dashboard', [
             'pendingAuthorizations' => Authorization::query()
                 ->with(['student.classroomGroup', 'responsible', 'teacher'])
@@ -37,7 +33,6 @@ class PortariaController extends Controller
                     ->where('status', Authorization::STATUS_AGUARDANDO_PORTARIA)
                     ->count(),
                 'released_today' => $releasedToday->count(),
-                'average_release_minutes' => $averageReleaseMinutes ? round($averageReleaseMinutes) : null,
             ],
         ]);
     }

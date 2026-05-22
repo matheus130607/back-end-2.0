@@ -69,9 +69,13 @@ class ProfessorController extends Controller
             $this->notifyResponsible($authorization->fresh(['student.classroomGroup', 'responsible']));
         }
 
+        $message = $authorization->isSaida()
+            ? 'Saida encaminhada para a Portaria. O responsavel sera notificado apos a liberacao fisica.'
+            : 'Entrada registrada. Responsavel notificado por e-mail e WhatsApp simulado.';
+
         return redirect()
             ->route('professor.dashboard')
-            ->with('success', 'Ciencia registrada com sucesso.');
+            ->with('success', $message);
     }
 
     private function authorizationsForTeacher(Request $request): Builder

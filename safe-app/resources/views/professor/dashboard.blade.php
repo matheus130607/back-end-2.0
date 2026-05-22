@@ -73,7 +73,7 @@
                         <form action="{{ route('professor.authorizations.acknowledge', $authorization) }}" method="POST" class="mt-5">
                             @csrf
                             <button class="w-full rounded-lg bg-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200">
-                                Registrar ciencia
+                                {{ $authorization->isSaida() ? 'Encaminhar para portaria' : 'Registrar entrada e notificar' }}
                             </button>
                         </form>
                     </article>

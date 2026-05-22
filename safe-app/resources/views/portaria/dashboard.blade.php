@@ -9,11 +9,10 @@
         $metricCards = [
             ['label' => 'Aguardando liberacao', 'value' => $metrics['waiting_release'], 'class' => 'border-emerald-200 bg-emerald-50 text-emerald-700'],
             ['label' => 'Saidas liberadas hoje', 'value' => $metrics['released_today'], 'class' => 'border-slate-200 bg-slate-50 text-slate-700'],
-            ['label' => 'Tempo medio', 'value' => $metrics['average_release_minutes'] ? $metrics['average_release_minutes'] . ' min' : '--', 'class' => 'border-blue-200 bg-blue-50 text-blue-700'],
         ];
     @endphp
 
-    <section class="grid gap-3 md:grid-cols-3">
+    <section class="grid gap-3 md:grid-cols-2">
         @foreach($metricCards as $card)
             <div class="rounded-lg border p-4 {{ $card['class'] }}">
                 <div class="text-3xl font-black">{{ $card['value'] }}</div>

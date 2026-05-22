@@ -12,14 +12,21 @@ class TesteMovimentacaoAlunoMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public array $movimentacao = [
-        'aluno' => 'João Pedro Santos',
-        'turma' => '2º DS A',
-        'tipo' => 'Saída antecipada',
-        'status' => 'Saída realizada',
-        'horario' => '14:35',
-        'responsavel_validacao' => 'Portaria SAFE',
-    ];
+    public array $movimentacao;
+
+    public function __construct()
+    {
+        $this->movimentacao = [
+            'aluno' => 'João Pedro Santos',
+            'turma' => '2º DS A',
+            'tipo' => 'Saída antecipada',
+            'tipo_chave' => 'saida',
+            'status' => 'Saída realizada',
+            'horario' => now()->format('H:i'),
+            'responsavel_label' => 'Responsável pela validação',
+            'responsavel_validacao' => 'Portaria SAFE',
+        ];
+    }
 
     public function envelope(): Envelope
     {
