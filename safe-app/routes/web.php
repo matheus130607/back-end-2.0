@@ -1,71 +1,56 @@
 <?php
-use App\Http\Controllers\AuthorizationController;
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortariaController;
-use App\Models\User;
-use App\Models\Student;
+use App\Http\Controllers\ProfessorController;
+use App\Http\Controllers\SecretariaController;
+use App\Mail\TesteMovimentacaoAlunoMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
-// Rota base
-Route::get('/', function () {
-    return response()->json(['status' => 'SAFE Online']);
+Route::redirect('/', '/dashboard');
+
+Route::get('/teste/email-safe', function () {
+    Mail::to('matheus.malaman@aluno.senai.br')
+        ->send(new TesteMovimentacaoAlunoMail());
+
+    return 'E-mail de teste do SAFE enviado com sucesso para matheus.malaman@aluno.senai.br';
 });
 
-// 1. Criar Massa de Dados
-Route::get('/seed-teste', function() {
-    if (User::where('email', 'pai@email.com')->exists()) {
-        return response()->json(['message' => 'Os dados de teste já existem no banco!']);
-    }
-
-    $autorizador = User::create([
-        'name' => 'Marcos Rocha (Pai)',
-        'email' => 'pai@email.com',
-        'password' => bcrypt('123456'),
-        'role' => 'autorizador',
-        'phone' => '11999998888'
-    ]);
-
-    User::create([
-        'name' => 'Profª Ana Souza',
-        'email' => 'ana@escola.com',
-        'password' => bcrypt('123456'),
-        'role' => 'professor'
-    ]);
-
-    // Criando o Porteiro Silva para a portaria usar mais tarde
-    User::create([
-        'name' => 'Porteiro Silva',
-        'email' => 'silva@escola.com',
-        'password' => bcrypt('123456'),
-        'role' => 'portaria'
-    ]);
-
-    $aluno = Student::create([
-        'name' => 'Guilherme Rocha',
-        'classroom' => '4º Ano B',
-        'autorizador_id' => $autorizador->id
-    ]);
-
-    return response()->json([
-        'message' => 'Massa de dados criada com sucesso para testes!',
-        'autorizador_id' => $autorizador->id,
-        'student_id' => $aluno->id
-    ]);
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 });
 
-// 2. ROTA DE TESTE DA SECRETARIA (Modificada para GET para funcionar no navegador)
-Route::get('/teste/secretaria/solicitar', function() {
-    // Simula o preenchimento de um formulário da secretaria
-    $dadosSimulados = new \Illuminate\Http\Request([
-        'student_id'     => 1,
-        'autorizador_id' => 1,
-        'type'           => 'saida' // Pode mudar para 'entrada' se quiser testar o outro fluxo
-    ]);
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
 
-    return app(AuthorizationController::class)->solicitarFluxo($dadosSimulados);
-});
+Route::get('/dashboard', DashboardController::class)
+    ->middleware('auth')
+    ->name('dashboard');
 
-// 3. Painel do Professor
-Route::get('/professor/painel', [AuthorizationController::class, 'painelProfessor']);
+Route::middleware(['auth', 'role:secretaria'])
+    ->prefix('secretaria')
+    ->name('secretaria.')
+    ->group(function () {
+        Route::get('/dashboard', [SecretariaController::class, 'dashboard'])->name('dashboard');
+        Route::post('/authorizations', [SecretariaController::class, 'storeAuthorization'])->name('authorizations.store');
+    });
 
-// 4. ROTA DE TESTE DA PORTARIA (Modificada para GET para funcionar no navegador)
-Route::get('/teste/portaria/liberar/{id}', [PortariaController::class, 'liberarAluno']);
+Route::middleware(['auth', 'role:professor'])
+    ->prefix('professor')
+    ->name('professor.')
+    ->group(function () {
+        Route::get('/dashboard', [ProfessorController::class, 'dashboard'])->name('dashboard');
+        Route::post('/authorizations/{authorization}/acknowledge', [ProfessorController::class, 'acknowledge'])->name('authorizations.acknowledge');
+    });
+
+Route::middleware(['auth', 'role:portaria'])
+    ->prefix('portaria')
+    ->name('portaria.')
+    ->group(function () {
+        Route::get('/dashboard', [PortariaController::class, 'dashboard'])->name('dashboard');
+        Route::post('/authorizations/{authorization}/release', [PortariaController::class, 'release'])->name('authorizations.release');
+    });

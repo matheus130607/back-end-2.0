@@ -4,40 +4,71 @@ namespace App\Http\Controllers;
 
 use App\Models\Authorization;
 use App\Notifications\MovimentacaoAlunoNotification;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PortariaController extends Controller
 {
-    public function liberarAluno(Request $request, $id)
+    public function dashboard(): View
     {
-        // 1. Busca a autorização criada pela secretaria
-        $authorization = Authorization::with('student.autorizador')->findOrFail($id);
+        $today = now()->toDateString();
 
-        if ($authorization->status !== 'autorizado') {
-            return response()->json(['error' => 'Este fluxo já foi encerrado ou cancelado.'], 400);
+        $releasedToday = Authorization::query()
+            ->where('type', Authorization::TYPE_SAIDA)
+            ->where('status', Authorization::STATUS_SAIDA_REALIZADA)
+            ->whereDate('validated_at', $today)
+            ->get();
+
+        $averageReleaseMinutes = $releasedToday
+            ->filter(fn (Authorization $authorization) => $authorization->teacher_acknowledged_at && $authorization->validated_at)
+            ->avg(fn (Authorization $authorization) => $authorization->teacher_acknowledged_at->diffInMinutes($authorization->validated_at));
+
+        return view('portaria.dashboard', [
+            'pendingAuthorizations' => Authorization::query()
+                ->with(['student.classroomGroup', 'responsible', 'teacher'])
+                ->where('type', Authorization::TYPE_SAIDA)
+                ->where('status', Authorization::STATUS_AGUARDANDO_PORTARIA)
+                ->whereNotNull('teacher_acknowledged_at')
+                ->latest('teacher_acknowledged_at')
+                ->get(),
+            'metrics' => [
+                'waiting_release' => Authorization::where('type', Authorization::TYPE_SAIDA)
+                    ->where('status', Authorization::STATUS_AGUARDANDO_PORTARIA)
+                    ->count(),
+                'released_today' => $releasedToday->count(),
+                'average_release_minutes' => $averageReleaseMinutes ? round($averageReleaseMinutes) : null,
+            ],
+        ]);
+    }
+
+    public function release(Request $request, Authorization $authorization): RedirectResponse
+    {
+        $authorization->load(['student.classroomGroup', 'responsible', 'teacher']);
+
+        if (! $authorization->isSaida()) {
+            return back()->with('error', 'Entrada tardia nao pode ser liberada pela portaria.');
         }
 
-        // 2. Portaria carimba a saída/entrada física do aluno no exato momento
+        if ($authorization->status !== Authorization::STATUS_AGUARDANDO_PORTARIA || ! $authorization->teacher_acknowledged_at) {
+            return back()->with('error', 'Esta saida ainda nao esta pronta para liberacao fisica.');
+        }
+
         $authorization->update([
-            'status' => 'realizado',
-            'portaria_id' => 3, // ID simulado do Porteiro Silva que criamos no seed
-            'validated_at' => now()
+            'portaria_id' => $request->user()->id,
+            'validated_at' => now(),
+            'status' => Authorization::STATUS_SAIDA_REALIZADA,
         ]);
 
-        // 3. Busca o usuário responsável (o pai/mãe vinculado ao aluno) para notificar
-        $responsavel = $authorization->student->autorizador; 
-
-        // 4. Disparos do Desafio
-        // Envia o e-mail real para o Mailpit
+        $authorization = $authorization->fresh(['student.classroomGroup', 'responsible', 'teacher']);
         $notification = new MovimentacaoAlunoNotification($authorization);
-        $responsavel->notify($notification);
+        $authorization->responsible?->notify($notification);
+        $notification->simularWhatsapp();
 
-        // Executa a simulação do WhatsApp no arquivo de Log
-        $notification->simularWhatsapp($responsavel->phone);
+        $authorization->update(['notification_sent_at' => now()]);
 
-        return response()->json([
-            'message' => 'Portaria liberada! Aluno liberado e responsáveis notificados com sucesso.',
-            'dados' => $authorization
-        ]);
+        return redirect()
+            ->route('portaria.dashboard')
+            ->with('success', 'Saida validada. Responsavel notificado por e-mail e WhatsApp simulado.');
     }
 }
