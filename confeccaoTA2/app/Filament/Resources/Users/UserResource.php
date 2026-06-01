@@ -10,15 +10,19 @@ use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
+use App\Support\FilamentAccess;
+use App\Support\PermissionCatalog;
 use BackedEnum;
-use UnitEnum;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
-use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class UserResource extends Resource
 {
@@ -40,35 +44,81 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Usuários';
 
+    public static function canViewAny(): bool
+    {
+        return FilamentAccess::canAny('usuarios.gerenciar');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canViewAny();
+    }
+
     public static function form(Schema $schema): Schema
     {
-        // return UserForm::configure($schema);
         return $schema
         ->schema([
+            Section::make('Dados do usuário')
+                ->schema([
+                    TextInput::make('name')
+                        ->label('Nome')
+                        ->required(),
 
-            TextInput::make('name')
-            ->label('Nome')
-            ->required(),
+                    TextInput::make('email')
+                        ->label('E-mail')
+                        ->email()
+                        ->unique(ignoreRecord: true)
+                        ->required(),
 
-            TextInput::make('email')
-            ->label('E-mail')
-            ->required(),
+                    TextInput::make('password')
+                        ->label('Senha')
+                        ->password()
+                        ->revealable()
+                        ->required(fn (string $operation): bool => $operation === 'create')
+                        ->dehydrated(fn (?string $state): bool => filled($state)),
+                ])
+                ->columns(3),
 
-            TextInput::make('password')
-            ->label('Senha')
-            ->password()
-            ->revealable()
-            ->required(),
+            Section::make('Acesso')
+                ->schema([
+                    Select::make('roles')
+                        ->relationship('roles', 'name')
+                        ->label('Cargo')
+                        ->multiple()
+                        ->preload()
+                        ->searchable()
+                        ->required(),
 
-            Select::make('permissions')
-            ->relationship('permissions', 'name')
-            ->label('Permissão')
-            ->required(),
-
-            Select::make('roles')
-            ->relationship('roles', 'name')
-            ->label('Cargo')
-            ->required(),
+                    Select::make('permissions')
+                        ->relationship('permissions', 'name')
+                        ->label('Permissões adicionais')
+                        ->multiple()
+                        ->options(fn (): array => PermissionCatalog::groupedPermissionOptions())
+                        ->preload()
+                        ->searchable()
+                        ->helperText('Use apenas para exceções; o ideal é controlar acesso pelos cargos.'),
+                ])
+                ->columns(2),
         ]);
     }
 
@@ -91,18 +141,17 @@ class UserResource extends Resource
             ->label('E-mail')
             ->searchable(),
 
-            TextColumn::make('password')
-            ->label('Senha')
-            ->formatStateUsing(fn () => '********')
-            ->searchable(),
-
-            TextColumn::make('permissios.name')
-            ->label('Permissão')
-            ->searchable(),
-
             TextColumn::make('roles.name')
             ->label('Cargo')
+            ->badge()
             ->searchable(),
+
+            TextColumn::make('permissions.name')
+            ->label('Permissões adicionais')
+            ->formatStateUsing(fn (string $state): string => PermissionCatalog::labelFor($state))
+            ->badge()
+            ->limitList(3)
+            ->expandableLimitedList(),
 
         ]);
     }

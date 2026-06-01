@@ -36,8 +36,8 @@ class FornecedorsTable
                 //
             ])
             ->recordActions([
-                ViewAction::make()->label("Vizualizar"),
-                EditAction::make()->label("Editar"),
+                ViewAction::make()->label('Visualizar'),
+                EditAction::make()->label('Editar'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

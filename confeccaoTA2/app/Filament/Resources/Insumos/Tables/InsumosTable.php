@@ -38,7 +38,7 @@ class InsumosTable
                 //
             ])
             ->recordActions([
-                ViewAction::make()->label("Vizualizar"),
+                ViewAction::make()->label('Visualizar'),
                 EditAction::make()->label("Editar"),
             ])
             ->toolbarActions([

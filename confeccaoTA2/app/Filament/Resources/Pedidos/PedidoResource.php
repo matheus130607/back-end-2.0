@@ -7,29 +7,30 @@ use App\Filament\Resources\Pedidos\Pages\CreatePedido;
 use App\Filament\Resources\Pedidos\Pages\EditPedido;
 use App\Filament\Resources\Pedidos\Pages\ListPedidos;
 use App\Filament\Resources\Pedidos\Pages\ViewPedido;
-use App\Filament\Resources\Pedidos\Schemas\PedidoForm;
 use App\Filament\Resources\Pedidos\Schemas\PedidoInfolist;
 use App\Filament\Resources\Pedidos\Tables\PedidosTable;
 use App\Models\Pedido;
 use App\Models\Produto;
+use App\Support\FilamentAccess;
 use BackedEnum;
-use UnitEnum;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Repeater;
-use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use UnitEnum;
 
 class PedidoResource extends Resource
 {
     protected static ?string $model = Pedido::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
     protected static string|UnitEnum|null $navigationGroup = 'Vendas';
     protected static ?int $navigationSort = 1;
@@ -45,75 +46,111 @@ class PedidoResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Pedido';
 
+    public static function canViewAny(): bool
+    {
+        return FilamentAccess::canAny(['pedidos.gerenciar', 'pedidos.criar', 'pedidos.editar']);
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return FilamentAccess::canAny(['pedidos.gerenciar', 'pedidos.criar']);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return FilamentAccess::canAny(['pedidos.gerenciar', 'pedidos.editar']);
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return FilamentAccess::canAny('pedidos.gerenciar');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return FilamentAccess::canAny('pedidos.gerenciar');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
-
-                Select::make('cliente_id')
-                    ->relationship('cliente', 'nome')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->label('Selecione o Cliente'),
-
-                Select::make('status')
-                    ->options([
-                        'Pendente' => 'Pendente',
-                        'Em Produção' => 'Em Produção',
-                        'Finalizado' => 'Finalizado',
-                    ])
-                    ->default('Pendente')
-                    ->required(),
-
-                TextInput::make('valor_total')
-                    ->numeric()
-                    ->prefix('R$')
-                    ->readOnly() 
-                    ->label('Valor Total'),
-
-                Repeater::make('itens')
-                    ->relationship('itens') 
+                Section::make('Dados do pedido')
                     ->schema([
+                        Select::make('cliente_id')
+                            ->relationship('cliente', 'nome')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->label('Cliente'),
 
-                Select::make('produto_id')
-                    ->relationship('produto', 'nome')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->label('Produto')
-                    ->columnSpan(2)
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        if ($state) {
-                            $produto = Produto::find($state);
-                            $set('preco_unitario', $produto->preco_venda ?? 0);
-                        }
-                    }),
+                        Select::make('status')
+                            ->options(Pedido::statusOptions())
+                            ->default(Pedido::STATUS_PENDENTE)
+                            ->required()
+                            ->label('Status'),
 
-                TextInput::make('quantidade')
-                    ->numeric()
-                    ->default(1)
-                    ->required()
-                    ->live(onBlur: true) 
+                        TextInput::make('valor_total')
+                            ->numeric()
+                            ->prefix('R$')
+                            ->readOnly()
+                            ->label('Valor Total'),
+                    ])
+                    ->columns(3),
 
-                    ->afterStateUpdated(fn (Get $get, Set $set) => self::calcularTotal($get, $set))
-                    ->columnSpan(1),
+                Section::make('Produtos do pedido')
+                    ->schema([
+                        Repeater::make('itens')
+                            ->relationship('itens')
+                            ->schema([
+                                Select::make('produto_id')
+                                    ->relationship('produto', 'nome')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->live()
+                                    ->label('Produto')
+                                    ->columnSpan(2)
+                                    ->afterStateUpdated(function ($state, Get $get, Set $set): void {
+                                        if (! $state) {
+                                            return;
+                                        }
 
-                TextInput::make('preco_unitario')
-                    ->numeric()
-                    ->prefix('R$')
-                    ->required()
-                    ->live(onBlur: true)
+                                        $produto = Produto::find($state);
 
-                    ->afterStateUpdated(fn (Get $get, Set $set) => self::calcularTotal($get, $set))
-                    ->columnSpan(1),
-                ])
-                    ->columns(4)
-                    ->columnSpanFull()
-                    ->label('Produtos do Pedido')
-                    ->live()
+                                        $set('preco_unitario', $produto?->preco_venda ?? 0);
+                                        self::calcularTotal($get, $set);
+                                    }),
 
-                    ->afterStateUpdated(fn (Get $get, Set $set) => self::calcularTotal($get, $set)),
+                                TextInput::make('quantidade')
+                                    ->numeric()
+                                    ->default(1)
+                                    ->minValue(1)
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (Get $get, Set $set) => self::calcularTotal($get, $set))
+                                    ->columnSpan(1),
+
+                                TextInput::make('preco_unitario')
+                                    ->numeric()
+                                    ->prefix('R$')
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (Get $get, Set $set) => self::calcularTotal($get, $set))
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(4)
+                            ->columnSpanFull()
+                            ->label('Produtos')
+                            ->addActionLabel('Adicionar produto')
+                            ->live()
+                            ->afterStateUpdated(fn (Get $get, Set $set) => self::calcularTotal($get, $set)),
+                    ]),
             ]);
     }
 
@@ -125,36 +162,6 @@ class PedidoResource extends Resource
     public static function table(Table $table): Table
     {
         return PedidosTable::configure($table);
-        return $table
-            ->columns([
-
-                TextColumn::make('cliente.nome')
-                    ->label('Cliente')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('status')
-                    ->badge() 
-                    ->color(fn (string $state): string => match ($state) {
-                        'Pendente' => 'warning',
-                        'Em Produção' => 'info',
-                        'Finalizado' => 'success',
-                        default => 'gray',
-                    }),
-
-                TextColumn::make('valor_total')
-                    ->label('Valor Total')
-                    ->money('BRL') 
-                    ->sortable(),
-
-                TextColumn::make('created_at')
-                    ->label('Data do Pedido')
-                    ->dateTime('d/m/Y H:i') 
-                    ->sortable(),
-            ])
-            ->filters([
-                //
-            ]); 
     }
 
     public static function getRelations(): array
@@ -174,13 +181,11 @@ class PedidoResource extends Resource
         ];
     }
 
-    public static function calcularTotal(Get $get, Set $set): void {
-
-        // Pega todos os itens que estão no Repeater naquele momento
-        $itens = $get('itens') ?? [];
+    public static function calcularTotal(Get $get, Set $set): void
+    {
+        $itens = $get('itens') ?? $get('../../itens') ?? [];
         $total = 0;
 
-        //Passa por cada linha somando (quantidade * preco)
         foreach ($itens as $item) {
             $quantidade = (float) ($item['quantidade'] ?? 0);
             $preco = (float) ($item['preco_unitario'] ?? 0);
@@ -188,7 +193,8 @@ class PedidoResource extends Resource
             $total += $quantidade * $preco;
         }
 
-        // Joga o resultado de volta lá no campo 'valor_total'
-        $set('valor_total', number_format($total, 2, '.', ''));
+        $statePath = $get('itens') === null ? '../../valor_total' : 'valor_total';
+
+        $set($statePath, number_format($total, 2, '.', ''));
     }
 }

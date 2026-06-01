@@ -10,14 +10,16 @@ use App\Filament\Resources\Fornecedors\Schemas\FornecedorForm;
 use App\Filament\Resources\Fornecedors\Schemas\FornecedorInfolist;
 use App\Filament\Resources\Fornecedors\Tables\FornecedorsTable;
 use App\Models\Fornecedor;
+use App\Support\FilamentAccess;
 use BackedEnum;
-use UnitEnum;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class FornecedorResource extends Resource
 {
@@ -38,7 +40,37 @@ class FornecedorResource extends Resource
     protected static ?string $pluralModelLabel = 'Fornecedores';
 
 
-    protected static ?string $recordTitleAttribute = 'fonecedor';
+    protected static ?string $recordTitleAttribute = 'empresa';
+
+    public static function canViewAny(): bool
+    {
+        return FilamentAccess::canAny('fornecedores.gerenciar');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canViewAny();
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -46,7 +78,7 @@ class FornecedorResource extends Resource
         return $schema
         ->schema([
         TextInput::make('empresa')->required()->label('Nome da empresa'),
-        TextInput::make('documento')->email()->label('CNPJ'),
+        TextInput::make('documento')->label('CNPJ'),
         TextInput::make('endereco')->label('Endereço'),
         TextInput::make('telefone')->tel()->label('Telefone'),
 

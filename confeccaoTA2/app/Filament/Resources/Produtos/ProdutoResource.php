@@ -10,14 +10,16 @@ use App\Filament\Resources\Produtos\Schemas\ProdutoForm;
 use App\Filament\Resources\Produtos\Schemas\ProdutoInfolist;
 use App\Filament\Resources\Produtos\Tables\ProdutosTable;
 use App\Models\Produto;
+use App\Support\FilamentAccess;
 use BackedEnum;
-use UnitEnum;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
-Use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class ProdutoResource extends Resource
 {
@@ -38,6 +40,36 @@ class ProdutoResource extends Resource
     protected static ?string $pluralModelLabel = 'Produtos';
 
     protected static ?string $recordTitleAttribute = 'Produto';
+
+    public static function canViewAny(): bool
+    {
+        return FilamentAccess::canAny(['produtos.gerenciar', 'estoque.visualizar']);
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return FilamentAccess::canAny('produtos.gerenciar');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return FilamentAccess::canAny('produtos.gerenciar');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return FilamentAccess::canAny('produtos.gerenciar');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return FilamentAccess::canAny('produtos.gerenciar');
+    }
 
     public static function form(Schema $schema): Schema
     {

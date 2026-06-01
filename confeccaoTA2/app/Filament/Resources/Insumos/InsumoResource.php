@@ -10,14 +10,16 @@ use App\Filament\Resources\Insumos\Schemas\InsumoForm;
 use App\Filament\Resources\Insumos\Schemas\InsumoInfolist;
 use App\Filament\Resources\Insumos\Tables\InsumosTable;
 use App\Models\Insumo;
+use App\Support\FilamentAccess;
 use BackedEnum;
-use UnitEnum;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class InsumoResource extends Resource
 {
@@ -39,6 +41,36 @@ class InsumoResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Insumo';
 
+    public static function canViewAny(): bool
+    {
+        return FilamentAccess::canAny('insumos.gerenciar');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canViewAny();
+    }
+
     public static function form(Schema $schema): Schema
     {
         
@@ -57,8 +89,7 @@ class InsumoResource extends Resource
 
     public static function table(Table $table): Table
     {
-        
-    
+       
         return $table->columns([
             TextColumn::make('nome')->searchable(),
             TextColumn::make('unidade_medida'),
